@@ -24,7 +24,7 @@
           <div class="tips frowc" v-if="isOver">{{ cTips }}</div>
         </div>
         <div class="btn-bar frowc" :class="{ none: isOver }">
-          <div class="text" v-if="!isInit">拖动按钮完成上方拼图</div>
+          <div class="text" v-if="!isInit">{{ tips1 }}</div>
           <div class="blank" :style="{ width: `${left}px` }" v-else></div>
           <div
             class="btn cursor"
@@ -57,7 +57,7 @@
           <div class="tips frowc" v-if="isOver">{{ cTips }}</div>
         </div>
         <div class="btn-bar frowc" :class="{ none: isOver }">
-          <div class="text" v-if="!isInit">拖动按钮使图片还原水平</div>
+          <div class="text" v-if="!isInit">{{ tips2 }}</div>
           <div class="blank" :style="{ width: `${left}px` }" v-else></div>
           <div
             class="btn cursor"
@@ -99,7 +99,7 @@
           :class="{ none: isOver }"
           :ref="(el) => el && (elBtn = el)"
         >
-          <div class="text" v-if="!list.length">请从上图选出成语</div>
+          <div class="text" v-if="!list.length">{{ tips3 }}</div>
           <template v-else>
             <div
               class="blank frowc"
@@ -121,6 +121,7 @@ import { css, handleShuffle } from "./js/MTween.js";
 
 export default {
   name: "Captcha",
+  emits: ["handleClose", "handleRefresh", "handleSucc", "handleFail"],
   props: {
     bg: {
       type: String,
@@ -134,16 +135,25 @@ export default {
       type: Number,
       default: 5,
     },
-    tList: {
-      type: Array,
-      default() {
-        return ["一帆风顺", "两全其美", "三阳开泰", "四通八达", "五谷丰登"];
-      },
-    },
-    mText: {
+    tips1: {
       type: String,
+      default: "拖动按钮完成上方拼图",
+    },
+    tips2: {
+      type: String,
+      default: "拖动按钮使图片还原水平",
+    },
+    tips3: {
+      type: String,
+      default: "请从上图选出成语",
+    },
+    mData: {
+      type: Object,
       default() {
-        return "我们都是好孩子";
+        return {
+          list: ["一帆风顺", "两全其美", "三阳开泰", "四通八达", "五谷丰登"],
+          text: "混淆文字",
+        };
       },
     },
   },
@@ -182,8 +192,8 @@ export default {
         num = handleShuffle([60, 100, 140, 180, 220], true) + num * 40;
         res = vm.rotate = vm.type02 = Math.round(num);
       } else if (props.type === 3) {
-        let text = handleShuffle([...props.mText, ..."非法传值"]);
-        res = vm.type03.target = [...handleShuffle(props.tList, true)];
+        let text = handleShuffle([...props.mData.text]);
+        res = vm.type03.target = [...handleShuffle(props.mData.list, true)];
         text = handleShuffle([...res, ...text].slice(0, 6));
         vm.list = [];
         vm.type03.list = text.map((text, index) => {
