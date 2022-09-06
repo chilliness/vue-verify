@@ -4,11 +4,11 @@
       <div class="type1" v-if="type === 1">
         <div class="title frow">请完成下列验证</div>
         <div
-          class="btn-refresh cursor"
+          class="btn-refresh pointer"
           @click="handleSort"
           v-if="!isOver"
         ></div>
-        <div class="btn-close cursor" @click="handleClose"></div>
+        <div class="btn-close pointer" @click="handleClose"></div>
         <div class="box" :style="{ backgroundImage: `url(${bg})` }">
           <div class="target" :style="type01"></div>
           <div
@@ -27,7 +27,7 @@
           <div class="text" v-if="!isInit">{{ tips1 }}</div>
           <div class="blank" :style="{ width: `${left}px` }" v-else></div>
           <div
-            class="btn cursor"
+            class="btn pointer"
             :style="{ left: `${left}px` }"
             @touchstart="handleStart"
             @touchmove="handleMove"
@@ -40,18 +40,20 @@
       <div class="type2" v-else-if="type === 2">
         <div class="title frow">请完成下列验证</div>
         <div
-          class="btn-refresh cursor"
+          class="btn-refresh pointer"
           @click="handleSort"
           v-if="!isOver"
         ></div>
-        <div class="btn-close cursor" @click="handleClose"></div>
+        <div class="btn-close pointer" @click="handleClose"></div>
         <div class="box">
-          <div class="target visible" :ref="(el) => el && (elDiv = el)"></div>
+          <div class="target hidden" :ref="(el) => el && (elDiv = el)"></div>
           <div
             class="curr"
+            :class="{ active: isInit }"
             :style="{
-              transform: `rotate(${rotate}deg)`,
-              backgroundImage: `url(${bg})`,
+              '--bg': `url(${bg})`,
+              '--angle1': `rotate(${rotate}deg)`,
+              '--angle2': `rotate(${360 - rotate}deg)`,
             }"
           ></div>
           <div class="tips frowc" v-if="isOver">{{ cTips }}</div>
@@ -60,7 +62,7 @@
           <div class="text" v-if="!isInit">{{ tips2 }}</div>
           <div class="blank" :style="{ width: `${left}px` }" v-else></div>
           <div
-            class="btn cursor"
+            class="btn pointer"
             :style="{ left: `${left}px` }"
             @touchstart="handleStart"
             @touchmove="handleMove"
@@ -73,18 +75,18 @@
       <div class="type3" v-else-if="type === 3">
         <div class="title frow">请完成下列验证</div>
         <div
-          class="btn-refresh cursor"
+          class="btn-refresh pointer"
           @click="handleSort"
           v-if="!isOver"
         ></div>
-        <div class="btn-close cursor" @click="handleClose"></div>
+        <div class="btn-close pointer" @click="handleClose"></div>
         <div class="box" :style="{ backgroundImage: `url(${bg})` }">
           <div
-            class="curr frowc visible"
+            class="curr frowc hidden"
             :ref="(el) => el && (elDiv = el)"
           ></div>
           <div
-            class="curr frowc cursor"
+            class="curr frowc pointer"
             :style="item.pos"
             v-for="(item, i) in type03.list"
             :key="i"
@@ -125,7 +127,7 @@ export default {
   props: {
     bg: {
       type: String,
-      default: require("./img/img_type01.jpeg"),
+      default: require("./img/img_type01.png"),
     },
     type: {
       type: Number,
@@ -141,7 +143,7 @@ export default {
     },
     tips2: {
       type: String,
-      default: "拖动按钮使图片还原水平",
+      default: "拖动按钮使图片旋转到合适位置",
     },
     tips3: {
       type: String,
@@ -176,7 +178,7 @@ export default {
     vm.cTips = computed(() => `本次用时${vm.overTime}秒`);
 
     vm.handleSort = () => {
-      let [num, res] = [Math.random(), null];
+      let [res, than = 60] = [null];
       let pWidth = css(vm.elDiv.parentNode, "width");
       let pHeight = css(vm.elDiv.parentNode, "height");
       let width = css(vm.elDiv, "width");
@@ -185,12 +187,25 @@ export default {
       touch.time = Date.now();
 
       if (props.type === 1) {
-        let left = Math.round(num * (pWidth - width * 2) + width) + "px";
-        let top = Math.round(num * (pHeight - height * 2) + height) + "px";
+        than *= 0.8;
+        pWidth -= width * 2;
+        let left = parseInt(Math.random() * pWidth + width) + "px";
+        let top = parseInt(Math.random() * (pHeight - height)) + "px";
+        // 避免和上次接近
+        while (Math.abs(parseInt(vm.type01.left) - parseInt(left)) < than) {
+          left = parseInt(Math.random() * pWidth + width) + "px";
+        }
+        while (Math.abs(parseInt(vm.type01.top) - parseInt(top)) < than) {
+          top = parseInt(Math.random() * (pHeight - height)) + "px";
+        }
         res = vm.type01 = { left, top };
       } else if (props.type === 2) {
-        num = handleShuffle([60, 100, 140, 180, 220], true) + num * 40;
-        res = vm.rotate = vm.type02 = Math.round(num);
+        let num = parseInt(Math.random() * (240 + 1) + 60);
+        // 避免和上次接近
+        while (Math.abs(vm.rotate - num) < than) {
+          num = parseInt(Math.random() * (240 + 1) + 60);
+        }
+        res = vm.rotate = vm.type02 = num;
       } else if (props.type === 3) {
         let text = handleShuffle([...props.mData.text]);
         res = vm.type03.target = [...handleShuffle(props.mData.list, true)];
@@ -198,9 +213,9 @@ export default {
         vm.list = [];
         vm.type03.list = text.map((text, index) => {
           let num = Math.random();
-          let val = Math.round(width * index + num * 30);
+          let val = parseInt(width * index + num * 30);
           let left = Math.min(val, pWidth - width) + "px";
-          let top = Math.round(num * (pHeight - height * 2) + height) + "px";
+          let top = parseInt(num * (pHeight - height * 2) + height) + "px";
           return { text, pos: { left, top } };
         });
       }
@@ -233,7 +248,7 @@ export default {
 
       vm.left = Math.max(0, Math.min(diffX, touch.max));
       if (props.type === 2) {
-        vm.rotate = Math.round((vm.left / touch.max) * 360 + vm.type02);
+        vm.rotate = parseInt((vm.left / touch.max) * 360 + vm.type02);
       }
     };
 
@@ -276,7 +291,7 @@ export default {
         if (vm.list.join() === target.join()) {
           return vm.handleOver(isTrusted);
         }
-        vm.list = [];
+        setTimeout(vm.handleSort, 300);
         emit("handleFail", isTrusted);
       }
     };
@@ -335,11 +350,23 @@ export default {
   text-overflow: ellipsis;
   overflow: hidden;
 }
+
+.none {
+  pointer-events: none;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.hidden {
+  visibility: hidden;
+}
 </style>
 
 <style lang="scss" scoped>
 .captcha-wrap {
-  z-index: 999;
+  z-index: 9;
   font-size: 14px;
   color: #333;
   user-select: none;
@@ -360,7 +387,7 @@ export default {
     top: 5px;
     width: 40px;
     height: 40px;
-    background: url(./img/img_refresh01.png) no-repeat center / contain;
+    background: url(./img/img_refresh01.png) no-repeat center / cover;
   }
   .btn-close {
     position: absolute;
@@ -368,16 +395,7 @@ export default {
     top: 5px;
     width: 40px;
     height: 40px;
-    background: url(./img/img_close01.png) no-repeat center / contain;
-  }
-  .none {
-    pointer-events: none;
-  }
-  .cursor {
-    cursor: pointer;
-  }
-  .visible {
-    visibility: hidden;
+    background: url(./img/img_close01.png) no-repeat center / cover;
   }
   .tips {
     position: absolute;
@@ -439,7 +457,7 @@ export default {
         width: $val;
         border-radius: 5px;
         background: #eee url(./img/img_arrow-right01.png) no-repeat center /
-          contain;
+          cover;
       }
     }
   }
@@ -469,18 +487,37 @@ export default {
         margin: 0 auto;
         overflow: hidden;
         border-radius: 50%;
-        background: #fff no-repeat center / cover;
-        &::after {
-          content: "我是水平线";
+        &.active {
+          &::before,
+          &::after {
+            border-color: transparent;
+          }
+        }
+        &::before {
+          content: "";
           position: absolute;
           left: 0;
+          top: 0;
           right: 0;
-          bottom: -10px;
-          height: 30px;
-          text-align: center;
-          font-size: 12px;
-          color: #fff;
-          background: linear-gradient(0deg, #fff, #2a7dff);
+          bottom: 0;
+          border-radius: 50%;
+          border: 30px solid rgba(0, 0, 0, 0.2);
+          transform: var(--angle1);
+          transition: border 0.3s;
+          background: #fff var(--bg) no-repeat center;
+        }
+        &::after {
+          content: "";
+          position: absolute;
+          left: 30px;
+          top: 30px;
+          right: 30px;
+          bottom: 30px;
+          border: 2px solid #fff;
+          border-radius: 50%;
+          transform: var(--angle2);
+          transition: border 0.3s;
+          background: var(--bg) no-repeat center;
         }
       }
     }
@@ -506,7 +543,7 @@ export default {
         width: $val;
         border-radius: 5px;
         background: #eee url(./img/img_arrow-right01.png) no-repeat center /
-          contain;
+          cover;
       }
     }
   }

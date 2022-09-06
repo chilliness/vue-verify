@@ -1,9 +1,9 @@
 <template>
   <div class="home-wrap">
-    <div class="btn" v-for="(item, i) in list" :key="i" @click="which = i">
+    <div class="btn" @click="which = i" v-for="(item, i) in 3" :key="i">
       {{ "样式" + (i + 1) }}
     </div>
-    <template v-for="(item, i) in list" :key="i">
+    <template v-for="(item, i) in 3" :key="i">
       <tag-captcha
         :type="i + 1"
         @handleClose="which = -1"
@@ -24,7 +24,7 @@ export default {
   name: "Home",
   components: { TagCaptcha },
   setup(props) {
-    let vm = reactive({ list: "vue", which: -1 });
+    let vm = reactive({ which: -1 });
 
     vm.handleRefresh = (args) => console.log("刷新", args);
     vm.handleSucc = (args) => console.log("成功", args);
