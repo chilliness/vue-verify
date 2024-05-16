@@ -43,13 +43,7 @@ let Tween = {
     } else {
       s = (p / (2 * Math.PI)) * Math.asin(c / a);
     }
-    return (
-      -(
-        a *
-        Math.pow(2, 10 * (t -= 1)) *
-        Math.sin(((t * d - s) * (2 * Math.PI)) / p)
-      ) + b
-    );
+    return -(a * Math.pow(2, 10 * (t -= 1)) * Math.sin(((t * d - s) * (2 * Math.PI)) / p)) + b;
   },
   elasticOut(t, b, c, d, a, p) {
     let s;
@@ -68,11 +62,7 @@ let Tween = {
     } else {
       s = (p / (2 * Math.PI)) * Math.asin(c / a);
     }
-    return (
-      a * Math.pow(2, -10 * t) * Math.sin(((t * d - s) * (2 * Math.PI)) / p) +
-      c +
-      b
-    );
+    return a * Math.pow(2, -10 * t) * Math.sin(((t * d - s) * (2 * Math.PI)) / p) + c + b;
   },
   elasticBoth(t, b, c, d, a, p) {
     let s;
@@ -92,22 +82,9 @@ let Tween = {
       s = (p / (2 * Math.PI)) * Math.asin(c / a);
     }
     if (t < 1) {
-      return (
-        -0.5 *
-          (a *
-            Math.pow(2, 10 * (t -= 1)) *
-            Math.sin(((t * d - s) * (2 * Math.PI)) / p)) +
-        b
-      );
+      return -0.5 * (a * Math.pow(2, 10 * (t -= 1)) * Math.sin(((t * d - s) * (2 * Math.PI)) / p)) + b;
     }
-    return (
-      a *
-        Math.pow(2, -10 * (t -= 1)) *
-        Math.sin(((t * d - s) * (2 * Math.PI)) / p) *
-        0.5 +
-      c +
-      b
-    );
+    return a * Math.pow(2, -10 * (t -= 1)) * Math.sin(((t * d - s) * (2 * Math.PI)) / p) * 0.5 + c + b;
   },
   backIn(t, b, c, d, s) {
     if (typeof s === "undefined") {
@@ -198,22 +175,7 @@ export function cssTransform(el, attr, val) {
 }
 
 export function css(el, attr, val) {
-  if (
-    [
-      "rotate",
-      "rotateX",
-      "rotateY",
-      "rotateZ",
-      "scale",
-      "scaleX",
-      "scaleY",
-      "skewX",
-      "skewY",
-      "translateX",
-      "translateY",
-      "translateZ",
-    ].includes(attr)
-  ) {
+  if (["rotate", "rotateX", "rotateY", "rotateZ", "scale", "scaleX", "scaleY", "skewX", "skewY", "translateX", "translateY", "translateZ"].includes(attr)) {
     return cssTransform(el, attr, val);
   }
   if (arguments.length === 2) {
@@ -252,13 +214,13 @@ export function MTween(init) {
   }, 20);
 }
 
-export function handleShuffle(arr, isSingle = false) {
-  let [i, j] = [arr.length, null];
+export function handleShuffle(arr, isRturnOne = false) {
+  let [i = arr.length, j] = [];
   while (i) {
     j = Math.floor(Math.random() * i--);
     [arr[i], arr[j]] = [arr[j], arr[i]];
   }
-  return isSingle ? arr[0] : arr;
+  return isRturnOne ? arr[0] : arr;
 }
 
 export default MTween;

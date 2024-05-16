@@ -1,27 +1,17 @@
 <template>
-  <div class="home-wrap">
-    <div class="btn" @click="which = i" v-for="(item, i) in 3" :key="i">
-      {{ "样式" + (i + 1) }}
-    </div>
+  <div class="page-wrap">
+    <div class="btn" v-for="(item, i) in 3" :key="i" @click="which = i">{{ "样式" + (i + 1) }}</div>
     <template v-for="(item, i) in 3" :key="i">
-      <tag-captcha
-        :type="i + 1"
-        @handleClose="which = -1"
-        @handleRefresh="handleRefresh"
-        @handleSucc="handleSucc"
-        @handleFail="handleFail"
-        v-if="which === i"
-      ></tag-captcha>
+      <tag-captcha :type="i + 1" @handleClose="which = -1" @handleRefresh="handleRefresh" @handleSucc="handleSucc" @handleFail="handleFail" v-if="which === i" />
     </template>
   </div>
 </template>
 
 <script>
 import { toRefs, reactive } from "vue";
-import TagCaptcha from "@/components/tag-captcha";
+import TagCaptcha from "@/components/tag-captcha/index.vue";
 
 export default {
-  name: "Home",
   components: { TagCaptcha },
   setup(props) {
     let vm = reactive({ which: -1 });
@@ -36,7 +26,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.home-wrap {
+.page-wrap {
   padding-top: 25vh;
   .btn {
     display: flex;

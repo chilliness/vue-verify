@@ -18,7 +18,7 @@
 
 > 效果
 
-![最终效果](/demo/demo.gif)
+![最终效果](./demo/demo.gif)
 
 > 注意事项
 
@@ -35,23 +35,17 @@
 ## Project setup
 
 ```
-npm install
+pnpm install
 ```
 
 ### Compiles and hot-reloads for development
 
 ```
-npm run serve
+pnpm run dev
 ```
 
 ### Compiles and minifies for production
 
 ```
-npm run build
-```
-
-### Lints and fixes files
-
-```
-npm run lint
+pnpm run build
 ```

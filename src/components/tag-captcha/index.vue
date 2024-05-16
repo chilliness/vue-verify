@@ -1,13 +1,9 @@
 <template>
   <teleport to="body">
-    <div class="captcha-wrap fixed frowc" @touchmove.stop.prevent>
+    <div class="comp-wrap fixed frowc" @touchmove.stop.prevent>
       <div class="type1" v-if="type === 1">
         <div class="title frow">请完成下列验证</div>
-        <div
-          class="btn-refresh pointer"
-          @click="handleSort"
-          v-if="!isOver"
-        ></div>
+        <div class="btn-refresh pointer" @click="handleSort" v-if="!isOver"></div>
         <div class="btn-close pointer" @click="handleClose"></div>
         <div class="box" :style="{ backgroundImage: `url(${bg})` }">
           <div class="target" :style="type01"></div>
@@ -19,34 +15,22 @@
               backgroundImage: `url(${bg})`,
               backgroundPosition: `-${type01.left} -${type01.top}`,
             }"
-            :ref="(el) => el && (elDiv = el)"
+            ref="divRef"
           ></div>
           <div class="tips frowc" v-if="isOver">{{ cTips }}</div>
         </div>
         <div class="btn-bar frowc" :class="{ none: isOver }">
           <div class="text" v-if="!isInit">{{ tips1 }}</div>
           <div class="blank" :style="{ width: `${left}px` }" v-else></div>
-          <div
-            class="btn pointer"
-            :style="{ left: `${left}px` }"
-            @touchstart="handleStart"
-            @touchmove="handleMove"
-            @touchend="handleEnd"
-            @mousedown="handleStart"
-            :ref="(el) => el && (elBtn = el)"
-          ></div>
+          <div class="btn pointer" :style="{ left: `${left}px` }" @touchstart="handleStart" @touchmove="handleMove" @touchend="handleEnd" @mousedown="handleStart" ref="btnRef"></div>
         </div>
       </div>
       <div class="type2" v-else-if="type === 2">
         <div class="title frow">请完成下列验证</div>
-        <div
-          class="btn-refresh pointer"
-          @click="handleSort"
-          v-if="!isOver"
-        ></div>
+        <div class="btn-refresh pointer" @click="handleSort" v-if="!isOver"></div>
         <div class="btn-close pointer" @click="handleClose"></div>
         <div class="box">
-          <div class="target hidden" :ref="(el) => el && (elDiv = el)"></div>
+          <div class="target hidden" ref="divRef"></div>
           <div
             class="curr"
             :class="{ active: isInit }"
@@ -61,55 +45,22 @@
         <div class="btn-bar frowc" :class="{ none: isOver }">
           <div class="text" v-if="!isInit">{{ tips2 }}</div>
           <div class="blank" :style="{ width: `${left}px` }" v-else></div>
-          <div
-            class="btn pointer"
-            :style="{ left: `${left}px` }"
-            @touchstart="handleStart"
-            @touchmove="handleMove"
-            @touchend="handleEnd"
-            @mousedown="handleStart"
-            :ref="(el) => el && (elBtn = el)"
-          ></div>
+          <div class="btn pointer" :style="{ left: `${left}px` }" @touchstart="handleStart" @touchmove="handleMove" @touchend="handleEnd" @mousedown="handleStart" ref="btnRef"></div>
         </div>
       </div>
       <div class="type3" v-else-if="type === 3">
         <div class="title frow">请完成下列验证</div>
-        <div
-          class="btn-refresh pointer"
-          @click="handleSort"
-          v-if="!isOver"
-        ></div>
+        <div class="btn-refresh pointer" @click="handleSort" v-if="!isOver"></div>
         <div class="btn-close pointer" @click="handleClose"></div>
         <div class="box" :style="{ backgroundImage: `url(${bg})` }">
-          <div
-            class="curr frowc hidden"
-            :ref="(el) => el && (elDiv = el)"
-          ></div>
-          <div
-            class="curr frowc pointer"
-            :style="item.pos"
-            v-for="(item, i) in type03.list"
-            :key="i"
-            @click="handleClick(item.text, $event)"
-          >
-            {{ item.text }}
-          </div>
+          <div class="curr frowc hidden" ref="divRef"></div>
+          <div class="curr frowc pointer" :style="item.pos" v-for="(item, i) in type03.list" :key="i" @click="handleClick(item.text, $event)">{{ item.text }}</div>
           <div class="tips frowc" v-if="isOver">{{ cTips }}</div>
         </div>
-        <div
-          class="btn-bar frowc"
-          :class="{ none: isOver }"
-          :ref="(el) => el && (elBtn = el)"
-        >
+        <div class="btn-bar frowc" :class="{ none: isOver }" ref="btnRef">
           <div class="text" v-if="!list.length">{{ tips3 }}</div>
           <template v-else>
-            <div
-              class="blank frowc"
-              v-for="(item, i) in type03.target"
-              :key="i"
-            >
-              {{ list[i] }}
-            </div>
+            <div class="blank frowc" v-for="(item, i) in type03.target" :key="i">{{ list[i] }}</div>
           </template>
         </div>
       </div>
@@ -118,16 +69,16 @@
 </template>
 
 <script>
-import { toRefs, reactive, onMounted, computed } from "vue";
+import { toRefs, reactive, computed, onMounted } from "vue";
 import { css, handleShuffle } from "./js/MTween.js";
+import img from "./img/img_type01.png";
 
 export default {
-  name: "Captcha",
   emits: ["handleClose", "handleRefresh", "handleSucc", "handleFail"],
   props: {
     bg: {
       type: String,
-      default: require("./img/img_type01.png"),
+      default: img,
     },
     type: {
       type: Number,
@@ -168,8 +119,8 @@ export default {
       left: 0,
       rotate: 0,
       list: [],
-      elDiv: null,
-      elBtn: null,
+      divRef: null,
+      btnRef: null,
       type01: {},
       type02: 0,
       type03: {},
@@ -178,11 +129,11 @@ export default {
     vm.cTips = computed(() => `本次用时${vm.overTime}秒`);
 
     vm.handleSort = () => {
-      let [res, than = 60] = [null];
-      let pWidth = css(vm.elDiv.parentNode, "width");
-      let pHeight = css(vm.elDiv.parentNode, "height");
-      let width = css(vm.elDiv, "width");
-      let height = css(vm.elDiv, "height");
+      let [res = null, than = 60] = [];
+      let pWidth = css(vm.divRef.parentNode, "width");
+      let pHeight = css(vm.divRef.parentNode, "height");
+      let width = css(vm.divRef, "width");
+      let height = css(vm.divRef, "height");
       touch.max = pWidth - width;
       touch.time = Date.now();
 
@@ -259,14 +210,14 @@ export default {
       if (props.type === 1) {
         diff = Math.abs(vm.left - parseFloat(vm.type01.left));
         list = [
-          { el: vm.elDiv, target: { left: 0 } },
-          { el: vm.elBtn, target: { left: 0 } },
+          { el: vm.divRef, target: { left: 0 } },
+          { el: vm.btnRef, target: { left: 0 } },
         ];
       } else if (props.type === 2) {
         diff = Math.abs(parseFloat(vm.rotate) - 360) % 360;
         list = [
-          { el: vm.elDiv, target: { rotate: vm.type02 } },
-          { el: vm.elBtn, target: { left: 0 } },
+          { el: vm.divRef, target: { rotate: vm.type02 } },
+          { el: vm.btnRef, target: { left: 0 } },
         ];
       }
 
@@ -275,7 +226,7 @@ export default {
       }
 
       vm.isInit = false;
-      list.forEach(({ el, target }, index) => {
+      list.forEach(({ target }, index) => {
         if (!index && vm.left > 0) {
           emit("handleFail", isTrusted);
         }
@@ -304,7 +255,9 @@ export default {
 
     vm.handleClose = () => emit("handleClose");
 
-    onMounted(vm.handleSort);
+    onMounted(() => {
+      vm.handleSort();
+    });
 
     return { ...toRefs(vm) };
   },
@@ -365,8 +318,8 @@ export default {
 </style>
 
 <style lang="scss" scoped>
-.captcha-wrap {
-  z-index: 9;
+.comp-wrap {
+  z-index: 99999;
   font-size: 14px;
   color: #333;
   user-select: none;
@@ -456,8 +409,7 @@ export default {
       .btn {
         width: $val;
         border-radius: 5px;
-        background: #eee url(./img/img_arrow-right01.png) no-repeat center /
-          cover;
+        background: #eee url(./img/img_arrow-right01.png) no-repeat center / cover;
       }
     }
   }
@@ -542,8 +494,7 @@ export default {
       .btn {
         width: $val;
         border-radius: 5px;
-        background: #eee url(./img/img_arrow-right01.png) no-repeat center /
-          cover;
+        background: #eee url(./img/img_arrow-right01.png) no-repeat center / cover;
       }
     }
   }
